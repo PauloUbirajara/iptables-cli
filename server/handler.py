@@ -20,7 +20,7 @@ class Handler(Thread):
         request = json.loads(data.decode('utf8'))
 
         if request['action'] == 'create_user':
-          file = open('c:\Desenvolvimento\Workspaces\PYTHON\kalangonet\server\database.json', 'r')
+          file = open(file='database.json', mode='r')
           content = file.read()
           file.close()
           db = json.loads(content)
@@ -30,7 +30,7 @@ class Handler(Thread):
           db['users'].append(user.map())          
 
           content = json.dumps(db)
-          file = open('c:\Desenvolvimento\Workspaces\PYTHON\kalangonet\server\database.json', 'w')
+          file = open(file='database.json', mode='w')
           file.write(content)
           file.close()
 
