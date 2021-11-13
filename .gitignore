@@ -1,1 +1,5 @@
+# Remover cache ao rodar arquivos .py
 **/__pycache__
+
+# Remover arquivo local que representa o banco de dados
+server/database.json
