@@ -3,7 +3,7 @@ from threading import Thread
 from models import User, CreateUserRequest
 
 
-class KalangoClient(Thread):
+class Client(Thread):
 
   def __init__(self, host, port):
     Thread.__init__(self)
