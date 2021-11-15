@@ -19,6 +19,6 @@ class Server(Thread):
         print('\nAguardando conexão...')
         conn, addr = s.accept()
 
-        print(f'Conexão estabelecida com: {addr[0]}:{addr[1]}')
+        # print(f'Conexão estabelecida com: {addr[0]}:{addr[1]}')
         handler = Handler(conn, addr)
         handler.start()

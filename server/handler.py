@@ -12,29 +12,35 @@ class Handler(Thread):
 
   def run(self):
     with self.conn:
+      client_address = f'{self.addr[0]}:{self.addr[1]}'
+
       while True:
-        print(f'Aguardando comando de {self.addr[0]}:{self.addr[1]}')
+        print(f'Aguardando comando de {client_address}')
         data = self.conn.recv(1024)
-        if not data: break
+        if not data:
+          break
         
-        request = json.loads(data.decode('utf8'))
+        request = data.decode('utf8')
+        print('recebi', request)
 
-        if request['action'] == 'create_user':
-          file = open(file='database.json', mode='r')
-          content = file.read()
-          file.close()
-          db = json.loads(content)
+      print(f'Finalizando conexão com {client_address}')
 
-          user = User(request['data']['name'], request['data']['email'], request['data']['password'])
+        # if request['action'] == 'create_user':
+        #   file = open(file='database.json', mode='r')
+        #   content = file.read()
+        #   file.close()
+        #   db = json.loads(content)
 
-          db['users'].append(user.map())          
+        #   user = User(request['data']['name'], request['data']['email'], request['data']['password'])
 
-          content = json.dumps(db)
-          file = open(file='database.json', mode='w')
-          file.write(content)
-          file.close()
+        #   db['users'].append(user.map())          
 
-        else:
-          self.conn.sendall("Invalid command".encode('utf8'))
+        #   content = json.dumps(db)
+        #   file = open(file='database.json', mode='w')
+        #   file.write(content)
+        #   file.close()
+
+        # else:
+        #   self.conn.sendall("Invalid command".encode('utf8'))
 
         

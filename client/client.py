@@ -15,24 +15,24 @@ class Client(Thread):
       print(f'Realizando conexão com {self.host}:{self.port}')
       s.connect((self.host, self.port))
 
-      print('Conexão estabelecida')
       while True:
         cmd = input('> ')
+        print('enviar', cmd)
+        s.sendall(cmd.encode('utf8'))
+        # if cmd.startswith('create'):
+        #   json = self.get_user_json(cmd)
+        #   s.sendall(json.encode('utf8'))
+        #   #data = s.recv(1024)
+        #   #print(f'{data.decode("utf8")}')
 
-        if cmd.startswith('create'):
-          json = self.get_user_json(cmd)
-          s.sendall(json.encode('utf8'))
-          #data = s.recv(1024)
-          #print(f'{data.decode("utf8")}')
+        # elif cmd.startswith('add'):
+        #   ...
 
-        elif cmd.startswith('add'):
-          ...
-
-        elif cmd.startswith('quit'):
-          s.close()
-          break
-        else:
-          print('Comando inválido')
+        # elif cmd.startswith('quit'):
+        #   s.close()
+        #   break
+        # else:
+        #   print('Comando inválido')
 
   def get_user_json(self, cmd):
     aux = cmd.split(' ')
@@ -40,5 +40,3 @@ class Client(Thread):
       usuario = User(aux[2], aux[3], aux[4])
       req = CreateUserRequest(usuario.map())
       return req.get_json()
-
-
