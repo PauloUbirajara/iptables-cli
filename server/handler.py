@@ -3,44 +3,43 @@ import json
 from models import User
 from threading import Thread
 
+
 class Handler(Thread):
-  
-  def __init__(self, conn, addr):
-    Thread.__init__(self)
-    self.conn = conn
-    self.addr = addr
 
-  def run(self):
-    with self.conn:
-      client_address = f'{self.addr[0]}:{self.addr[1]}'
+    def __init__(self, conn, addr):
+        Thread.__init__(self)
+        self.conn = conn
+        self.addr = addr
 
-      while True:
-        print(f'Aguardando comando de {client_address}')
-        data = self.conn.recv(1024)
-        if not data:
-          break
-        
-        request = data.decode('utf8')
-        print('recebi', request)
+    def run(self):
+        with self.conn:
+            client_address = f'{self.addr[0]}:{self.addr[1]}'
 
-      print(f'Finalizando conexão com {client_address}')
+            while True:
+                print(f'Aguardando comando de {client_address}')
+                data = self.conn.recv(1024)
+                if not data:
+                    break
 
-        # if request['action'] == 'create_user':
-        #   file = open(file='database.json', mode='r')
-        #   content = file.read()
-        #   file.close()
-        #   db = json.loads(content)
+                request = data.decode('utf8')
+                print('recebi', request)
 
-        #   user = User(request['data']['name'], request['data']['email'], request['data']['password'])
+            print(f'Finalizando conexão com {client_address}')
 
-        #   db['users'].append(user.map())          
+            # if request['action'] == 'create_user':
+            #   file = open(file='database.json', mode='r')
+            #   content = file.read()
+            #   file.close()
+            #   db = json.loads(content)
 
-        #   content = json.dumps(db)
-        #   file = open(file='database.json', mode='w')
-        #   file.write(content)
-        #   file.close()
+            #   user = User(request['data']['name'], request['data']['email'], request['data']['password'])
 
-        # else:
-        #   self.conn.sendall("Invalid command".encode('utf8'))
+            #   db['users'].append(user.map())
 
-        
+            #   content = json.dumps(db)
+            #   file = open(file='database.json', mode='w')
+            #   file.write(content)
+            #   file.close()
+
+            # else:
+            #   self.conn.sendall("Invalid command".encode('utf8'))
