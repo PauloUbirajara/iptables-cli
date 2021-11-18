@@ -1,3 +1,6 @@
+from typing import List
+
+
 class CommandResponseType:
     OK = 0
     ERROR = 1
@@ -6,9 +9,18 @@ class CommandResponseType:
 
 class Command:
     name: str
+    command: str
 
-    def check(self, command):
-        return command == self.name
+    def check(self, command: str):
+        self.command = command
+
+        return command.startswith(self.name)
+
+    def get_args(self):
+        if not self.command:
+            return []
+
+        return self.command.strip().split(" ")[1:]
 
     def run(self):
         return CommandResponseType.OK
@@ -56,3 +68,46 @@ class ExitCommand(Command):
 
     def run(self):
         return CommandResponseType.STOP
+
+
+class UserCommand(Command):
+    name = "user"
+
+    def create_user(self, args: List[str]):
+        print("Criar usuário", args)
+        return CommandResponseType.OK
+
+    def list_users(self, args: List[str]):
+        print("Mostrar lista de usuários", args)
+        return CommandResponseType.OK
+
+    def remove_user(self, args: List[str]):
+        print("Deletar usuário", args)
+        return CommandResponseType.OK
+
+    def run(self):
+        available_actions = {
+            'create': self.create_user,
+            'list': self.list_users,
+            'remove': self.remove_user,
+        }
+
+        args = self.get_args()
+        if not args:
+            return CommandResponseType.ERROR
+
+        command_action = args[0]
+
+        if command_action not in available_actions:
+            return CommandResponseType.ERROR
+
+        selected_action = available_actions[command_action]
+        return selected_action(args)
+
+
+def get_available_commands():
+    return [
+        HelpCommand(),
+        ExitCommand(),
+        UserCommand()
+    ]
