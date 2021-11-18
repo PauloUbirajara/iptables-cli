@@ -1,24 +1,24 @@
 from socket import AF_INET, SOCK_STREAM, socket
 from threading import Thread
-from handler import Handler
+from typing import Union
+
+from server_handler import ServerHandler
+
 
 class Server(Thread):
+    addr: Union[str, int]
 
-  def __init__(self, host, port):
-    Thread.__init__(self)
-    self.host = host
-    self.port = port
-    self.stop = False
+    def __init__(self, host: str, port: int):
+        Thread.__init__(self)
+        self.addr = (host, port)
 
-  def run(self):
-    with socket(AF_INET, SOCK_STREAM) as s:
-      s.bind((self.host, self.port))
-      s.listen(1)
+    def run(self):
+        with socket(AF_INET, SOCK_STREAM) as s:
+            s.bind(self.addr)
+            s.listen(1)
 
-      while not self.stop:
-        print('\nAguardando conexão...')
-        conn, addr = s.accept()
+            while True:
+                conn, addr = s.accept()
 
-        # print(f'Conexão estabelecida com: {addr[0]}:{addr[1]}')
-        handler = Handler(conn, addr)
-        handler.start()
+                handler = ServerHandler(conn, addr)
+                handler.start()
