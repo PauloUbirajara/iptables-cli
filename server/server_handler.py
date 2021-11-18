@@ -5,7 +5,6 @@ from sys import path
 path.append('..')
 from command import CommandResponseType, get_available_commands
 
-
 # from models import User
 
 
