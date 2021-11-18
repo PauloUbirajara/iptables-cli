@@ -9,18 +9,18 @@ class CommandResponseType:
 
 class Command:
     name: str
-    command: str
+    command_line: str
 
-    def check(self, command: str):
-        self.command = command
+    def check(self, command_line: str):
+        self.command_line = command_line
 
-        return command.startswith(self.name)
+        return command_line.startswith(self.name)
 
     def get_args(self):
-        if not self.command:
+        if not self.command_line:
             return []
 
-        return self.command.strip().split(" ")[1:]
+        return self.command_line.strip().split(" ")[1:]
 
     def run(self):
         return CommandResponseType.OK
