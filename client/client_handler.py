@@ -20,13 +20,16 @@ class ClientHandler(Thread):
         if not data:
             return CommandResponseType.ERROR
 
-        #! Verificar a estrutura tipo HTTP (OK, ERROR)
+        # ! Verificar a estrutura tipo HTTP (OK, ERROR)
         return CommandResponseType.OK
 
     def check_for_available_commands(self, command: str):
         available_commands = get_available_commands()
-        # @ Ao invés de realizar duas verificações, enviar diretamente o comando para o servidor, lá ele verifica e retorna de acordo (ok, error, stop)
-        # @ Ao invés de percorrer a lista de comandos retornados, transformar em dicionários e verificar se começa com alguem da lista de chaves
+        # @ Ao invés de realizar duas verificações, enviar diretamente o comando para o servidor
+        # @ lá ele verifica e retorna de acordo (ok, error, stop)
+
+        # @ Ao invés de percorrer a lista de comandos retornados, transformar em dicionários 
+        # @ verificar se começa com alguem da lista de chaves
 
         for cmd in available_commands:
             if cmd.check(command):
