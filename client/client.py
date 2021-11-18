@@ -1,25 +1,19 @@
-from socket import AF_INET, SOCK_STREAM, socket
 from threading import Thread
 
-from handler import Handler
+from client_handler import ClientHandler
 
 
 class Client(Thread):
     host: str
     port: int
 
-    def __init__(self, host, port):
+    def __init__(self, host: str, port: int):
         Thread.__init__(self)
         self.host = host
         self.port = port
 
-    def server_address(self):
-        return f'{self.host}:{self.port}'
-
     def run(self):
-        with socket(AF_INET, SOCK_STREAM) as current_socket:
+        addr = (self.host, self.port)
 
-            handler = Handler(self.host, self.port, current_socket)
-            current_socket.connect((self.host, self.port))
-
-            handler.start()
+        handler = ClientHandler(*addr)
+        handler.start()
