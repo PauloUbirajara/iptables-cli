@@ -32,20 +32,3 @@ class ServerHandler(Thread):
 
         print(f'Finalizando conexão com {self.client_address}')
 
-        # if request['action'] == 'create_user':
-        #   file = open(file='database.json', mode='r')
-        #   content = file.read()
-        #   file.close()
-        #   db = json.loads(content)
-
-        #   user = User(request['data']['name'], request['data']['email'], request['data']['password'])
-
-        #   db['users'].append(user.map())
-
-        #   content = json.dumps(db)
-        #   file = open(file='database.json', mode='w')
-        #   file.write(content)
-        #   file.close()
-
-        # else:
-        #   self.conn.sendall("Invalid command".encode('utf8'))
