@@ -1,6 +1,3 @@
-from socket import socket
-
-
 class CommandResponseType:
     OK = 0
     ERROR = 1
@@ -8,11 +5,7 @@ class CommandResponseType:
 
 
 class Command:
-    socket: socket
     name: str
-
-    def __init__(self, socket: socket):
-        self.socket = socket
 
     def check(self, command):
         return command == self.name
