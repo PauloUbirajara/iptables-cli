@@ -1,8 +1,9 @@
 from threading import Thread
 from socket import AF_INET, SOCK_STREAM, socket, SocketType
+from json import loads
 from sys import path
 path.append('..')
-from command import CommandResponseType, get_available_commands
+from command import CommandResponseType, get_client_commands
 
 
 class ClientHandler(Thread):
@@ -20,11 +21,12 @@ class ClientHandler(Thread):
         if not data:
             return CommandResponseType.ERROR
 
-        # ! Verificar a estrutura tipo HTTP (OK, ERROR)
-        return CommandResponseType.OK
+        response = loads(data.decode('utf8'))
+        print('client - recebi', response)
+        return response['code']
 
     def check_for_available_commands(self, command: str):
-        available_commands = get_available_commands()
+        available_commands = get_client_commands()
         # @ Ao invés de realizar duas verificações, enviar diretamente o comando para o servidor
         # @ lá ele verifica e retorna de acordo (ok, error, stop)
 
@@ -33,10 +35,10 @@ class ClientHandler(Thread):
 
         for cmd in available_commands:
             if cmd.check(command):
-                self.socket.sendall(command.encode('utf8'))
-                return self.parse_server_response()
-
-        return CommandResponseType.ERROR
+                return cmd.run()
+            
+        self.socket.sendall(command.encode('utf8'))
+        return self.parse_server_response()
 
     def run(self):
         with socket(AF_INET, SOCK_STREAM) as current_socket:
