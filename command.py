@@ -105,9 +105,13 @@ class UserCommand(Command):
         return selected_action(args)
 
 
-def get_available_commands():
+def get_client_commands():
     return [
         HelpCommand(),
-        ExitCommand(),
+        ExitCommand()
+    ]
+
+def get_server_commands():
+    return [
         UserCommand()
     ]
