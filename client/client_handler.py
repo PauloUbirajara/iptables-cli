@@ -1,6 +1,6 @@
-from threading import Thread
-from socket import AF_INET, SOCK_STREAM, socket, SocketType
 from json import loads
+from socket import AF_INET, SOCK_STREAM, socket, SocketType
+from threading import Thread
 from sys import path
 path.append('..')
 from command import CommandResponseType, get_client_commands
@@ -30,13 +30,13 @@ class ClientHandler(Thread):
         # @ Ao invés de realizar duas verificações, enviar diretamente o comando para o servidor
         # @ lá ele verifica e retorna de acordo (ok, error, stop)
 
-        # @ Ao invés de percorrer a lista de comandos retornados, transformar em dicionários 
+        # @ Ao invés de percorrer a lista de comandos retornados, transformar em dicionários
         # @ verificar se começa com alguem da lista de chaves
 
         for cmd in available_commands:
             if cmd.check(command):
                 return cmd.run()
-            
+
         self.socket.sendall(command.encode('utf8'))
         return self.parse_server_response()
 

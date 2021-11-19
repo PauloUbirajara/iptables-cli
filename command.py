@@ -111,6 +111,7 @@ def get_client_commands():
         ExitCommand()
     ]
 
+
 def get_server_commands():
     return [
         UserCommand()

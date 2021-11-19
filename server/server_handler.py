@@ -17,16 +17,16 @@ class ServerHandler(Thread):
         Thread.__init__(self)
         self.conn = conn
         self.client_address = f'{addr[0]}:{addr[1]}'
-    
+
     def check_for_available_commands(self, command: str):
-        available_commands = get_server_commands()        
+        available_commands = get_server_commands()
 
         for cmd in available_commands:
             if cmd.check(command):
                 return cmd.run()
-        
+
         return CommandResponseType.ERROR
-    
+
     def parse_response_code_as_json(self, code: CommandResponseType):
         response_object = {
             "code": code.__str__()
@@ -53,4 +53,3 @@ class ServerHandler(Thread):
                 self.conn.sendall(response)
 
         print(f'Finalizando conexão com {self.client_address}')
-
