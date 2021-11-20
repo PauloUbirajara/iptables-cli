@@ -327,6 +327,38 @@ class RuleCommand(DatabaseCommand):
         return (code, message)
 
 
+class FirewallCommand(Command):
+    name = "firewall"
+
+    def start(self, args):
+        print(args)
+        return CommandResponseType.OK, 'show start'
+
+    def stop(self, args):
+        print(args)
+        return CommandResponseType.OK, 'show stop'
+
+    def run(self):
+        code = CommandResponseType.ERROR
+
+        args = self.get_args()
+        if not (args and len(args) >= 1):
+            message = "Não há argumentos suficientes!"
+            return (code, message)
+
+        available_actions = {
+            'start': self.start,
+            'stop': self.stop
+        }
+
+        action = args.pop(0)
+        if action not in available_actions:
+            message = "Ação inválida!"
+            return (code, message)
+
+        return available_actions[action](args)
+
+
 def get_client_commands():
     return [
         ClearCommand(),
