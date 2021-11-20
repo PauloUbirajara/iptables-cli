@@ -3,7 +3,8 @@ from socket import AF_INET, SOCK_STREAM, socket, SocketType
 from threading import Thread
 from sys import path
 path.append('..')
-from command import CommandResponseType, get_client_commands
+from command_response_type import CommandResponseType
+from command import get_client_commands
 
 
 class ClientHandler(Thread):
@@ -22,16 +23,22 @@ class ClientHandler(Thread):
             return CommandResponseType.ERROR
 
         response = loads(data.decode('utf8'))
-        print('client - recebi', response)
-        return response['code']
+
+        code_labels = {
+            str(CommandResponseType.OK): "SUCESSO",
+            str(CommandResponseType.ERROR): "FALHA",
+        }
+
+        code = response['code']
+        label = code_labels[code]
+
+        message = response['message']
+
+        print(f'{label}\n{"="*15}\n{message}')
+        return code
 
     def check_for_available_commands(self, command: str):
         available_commands = get_client_commands()
-        # @ Ao invés de realizar duas verificações, enviar diretamente o comando para o servidor
-        # @ lá ele verifica e retorna de acordo (ok, error, stop)
-
-        # @ Ao invés de percorrer a lista de comandos retornados, transformar em dicionários
-        # @ verificar se começa com alguem da lista de chaves
 
         for cmd in available_commands:
             if cmd.check(command):
