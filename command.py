@@ -1,10 +1,7 @@
 from typing import List
 
-
-class CommandResponseType:
-    OK = 0
-    ERROR = 1
-    STOP = 2
+from command_response_type import CommandResponseType
+from models import User
 
 
 class Command:
