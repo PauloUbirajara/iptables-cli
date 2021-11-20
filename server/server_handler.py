@@ -19,8 +19,8 @@ class ServerHandler(Thread):
 
     def parse_response_code_as_json(self, code: CommandResponseType, message: str):
         response_object = {
-            "message": message,
-            "code": code.__str__()
+            "code": code.__str__(),
+            "message": message
         }
         print(f"{response_object=}")
 
@@ -33,7 +33,9 @@ class ServerHandler(Thread):
             if cmd.check(command):
                 return cmd.run()
 
-        return (CommandResponseType.ERROR, "Comando inválido!")
+        code = CommandResponseType.ERROR
+        message = "Comando inválido!"
+        return (code, message)
 
     def run(self):
         print(f'[+] Novo client: {self.client_address}')

@@ -100,10 +100,20 @@ class UserCommand(Command):
 
         self.save_dict_to_database(db)
 
-        return (CommandResponseType.OK, f'Usuário criado com sucesso!')
+        code = CommandResponseType.OK
+        message = 'Usuário criado com sucesso!'
+
+        return (code, message)
 
     def parse_users_list_as_string(self, users: Dict[str, str]):
-        return '\n'.join(map(lambda x: f'ID: {x}\nNome: {users[x]["name"]}\nEmail: {users[x]["email"]}\n', users))
+        return 'Lista de usuários cadastrados:\n' + '\n'.join(
+            map(
+                lambda x: f'\
+                    ID: {x}\n\
+                    Nome: {users[x]["name"]}\n\
+                    Email: {users[x]["email"]}\n',
+                users
+            ))
 
     def get_users_from_database(self):
         content = self.get_database_content()
@@ -112,11 +122,13 @@ class UserCommand(Command):
         if not users:
             return None
 
-        return 'Lista de usuários cadastrados:\n' + self.parse_users_list_as_string(users)
+        return self.parse_users_list_as_string(users)
 
     def create_user(self, args: List[str]):
         if len(args) < 3:
-            return (CommandResponseType.ERROR, "Número de argumentos inválido!")
+            code = CommandResponseType.ERROR
+            message = "Número de argumentos inválido!"
+            return (code, message)
 
         password = args.pop()
         email = args.pop()
@@ -126,22 +138,29 @@ class UserCommand(Command):
         return self.add_user_to_database(user)
 
     def list_users(self, args: List[str]):
+        code = CommandResponseType.ERROR
         if len(args) != 1:
-            return (CommandResponseType.ERROR, "Número de argumentos inválido!")
+            message = "Número de argumentos inválido!"
+            return (code, message)
 
         flag = args.pop()
         if flag != 'all':
-            return (CommandResponseType.ERROR, "Sinalizador inválido!")
+            message = "Sinalizador inválido!"
+            return (code, message)
 
         users = self.get_users_from_database()
         if users is None:
-            return (CommandResponseType.ERROR, "Não foi possível obter usuários do banco de dados!")
+            message = "Não foi possível obter usuários do banco de dados!"
+            return (code, message)
 
-        return (CommandResponseType.OK, users)
+        code = CommandResponseType.OK
+        return (code, users)
 
     def remove_user(self, args: List[str]):
+        code = CommandResponseType.ERROR
         if len(args) != 1:
-            return (CommandResponseType.ERROR, "Número de argumentos inválido!")
+            message = "Número de argumentos inválido!"
+            return (code, message)
 
         email_or_id = args.pop()
 
@@ -158,11 +177,16 @@ class UserCommand(Command):
 
                 self.save_dict_to_database(database)
 
-                return (CommandResponseType.OK, "Usuário removido com sucesso!")
+                code = CommandResponseType.OK
+                message = "Usuário removido com sucesso!"
+                return (code, message)
 
-        return (CommandResponseType.ERROR, "Usuário não encontrado!")
+        message = "Usuário não encontrado!"
+        return (code, message)
 
     def run(self):
+        code = CommandResponseType.ERROR
+
         available_actions = {
             'create': self.create_user,
             'list': self.list_users,
@@ -171,12 +195,14 @@ class UserCommand(Command):
 
         args = self.get_args()
         if not (args and len(args) >= 1):
-            return (CommandResponseType.ERROR, "Não há argumentos suficientes!")
+            message = "Não há argumentos suficientes!"
+            return (code, message)
 
         command_action = args.pop(0)
 
         if command_action not in available_actions:
-            return (CommandResponseType.ERROR, "Operação não identificada!")
+            message = "Operação não identificada!"
+            return (code, message)
 
         selected_action = available_actions[command_action]
         return selected_action(args)
