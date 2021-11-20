@@ -1,9 +1,10 @@
+from types import FunctionType
 from typing import Dict, List
 from json import dumps, loads
 from os import system
 
 from command_response_type import CommandResponseType
-from models import User
+from models import User, Rule
 
 
 class Command:
@@ -77,9 +78,9 @@ class ExitCommand(Command):
         return CommandResponseType.STOP
 
 
-class UserCommand(Command):
-    name = "user"
+class DatabaseCommand(Command):
     database_name = 'database.json'
+    available_actions: Dict[str, FunctionType]
 
     def get_database_content(self):
         with open(file=self.database_name, mode='r') as file:
@@ -90,6 +91,34 @@ class UserCommand(Command):
         with open(file=self.database_name, mode='w') as file:
             content_json = dumps(database_dict, indent=2)
             file.write(content_json)
+
+    def run(self):
+        code = CommandResponseType.ERROR
+
+        args = self.get_args()
+        if not (args and len(args) >= 1):
+            message = "Não há argumentos suficientes!"
+            return (code, message)
+
+        command_action = args.pop(0)
+
+        if command_action not in self.available_actions:
+            message = "Operação não identificada!"
+            return (code, message)
+
+        selected_action = self.available_actions[command_action]
+        return selected_action(args)
+
+
+class UserCommand(DatabaseCommand):
+    name = "user"
+
+    def __init__(self):
+        self.available_actions = {
+            'create': self.create_user,
+            'list': self.list_users,
+            'remove': self.remove_user,
+        }
 
     def add_user_to_database(self, user: User):
         db = {}
@@ -105,13 +134,13 @@ class UserCommand(Command):
 
         return (code, message)
 
-    def parse_users_list_as_string(self, users: Dict[str, str]):
-        return 'Lista de usuários cadastrados:\n' + '\n'.join(
-            map(
-                lambda x: f'\
-                    ID: {x}\n\
-                    Nome: {users[x]["name"]}\n\
-                    Email: {users[x]["email"]}\n',
+    def parse_user_list_as_string(self, users: Dict[str, str]):
+        return 'Lista de usuários cadastrados:\n' + \
+            '\n'.join(map(
+                lambda x:
+                f'ID: {x}\n' +
+                f'Nome: {users[x]["name"]}\n' +
+                f'Email: {users[x]["email"]}\n',
                 users
             ))
 
@@ -122,11 +151,12 @@ class UserCommand(Command):
         if not users:
             return None
 
-        return self.parse_users_list_as_string(users)
+        return self.parse_user_list_as_string(users)
 
     def create_user(self, args: List[str]):
+        code = CommandResponseType.ERROR
+
         if len(args) < 3:
-            code = CommandResponseType.ERROR
             message = "Número de argumentos inválido!"
             return (code, message)
 
@@ -139,6 +169,7 @@ class UserCommand(Command):
 
     def list_users(self, args: List[str]):
         code = CommandResponseType.ERROR
+
         if len(args) != 1:
             message = "Número de argumentos inválido!"
             return (code, message)
@@ -158,6 +189,7 @@ class UserCommand(Command):
 
     def remove_user(self, args: List[str]):
         code = CommandResponseType.ERROR
+
         if len(args) != 1:
             message = "Número de argumentos inválido!"
             return (code, message)
@@ -184,28 +216,115 @@ class UserCommand(Command):
         message = "Usuário não encontrado!"
         return (code, message)
 
-    def run(self):
-        code = CommandResponseType.ERROR
 
-        available_actions = {
-            'create': self.create_user,
-            'list': self.list_users,
-            'remove': self.remove_user,
+class RuleCommand(DatabaseCommand):
+    name = "rule"
+
+    def __init__(self):
+        self.available_actions = {
+            'add': self.add_rule,
+            'list': self.list_rules,
+            'remove': self.remove_rule,
         }
 
-        args = self.get_args()
-        if not (args and len(args) >= 1):
-            message = "Não há argumentos suficientes!"
+    def add_rule_to_database(self, rule: Rule):
+        db = {}
+
+        content = self.get_database_content()
+        db.update(loads(content))
+        db['rules'].update({rule.id: rule.get()})
+
+        self.save_dict_to_database(db)
+
+        code = CommandResponseType.OK
+        message = 'Regra criada com sucesso!'
+
+        return (code, message)
+
+    def parse_rule_list_as_string(self, rules: Dict[str, str]):
+        return 'Lista de regras cadastradas:\n' + \
+            '\n'.join(map(
+                lambda x:
+                f'ID: {x}\n' +
+                f'Endereço IP: {rules[x]["ip"]}\n' +
+                f'Ação: {rules[x]["action"]}\n',
+                rules
+            ))
+
+    def get_rules_from_database(self):
+        content = self.get_database_content()
+        rules = loads(content).get('rules')
+
+        if not rules:
+            return None
+
+        return self.parse_rule_list_as_string(rules)
+
+    def add_rule(self, args: List[str]):
+        code = CommandResponseType.ERROR
+
+        if len(args) != 2:
+            message = "Número de argumentos inválido!"
             return (code, message)
 
-        command_action = args.pop(0)
+        ip, action = args
+        available_actions = ["ACCEPT", "DENY"]
 
-        if command_action not in available_actions:
-            message = "Operação não identificada!"
+        if action not in available_actions:
+            message = "Ação inválida!"
             return (code, message)
 
-        selected_action = available_actions[command_action]
-        return selected_action(args)
+        rule = Rule(ip, action)
+
+        return self.add_rule_to_database(rule)
+
+    def list_rules(self, args: List[str]):
+        code = CommandResponseType.ERROR
+        if len(args) != 1:
+            message = "Número de argumentos inválido!"
+            return (code, message)
+
+        flag = args.pop()
+        if flag != 'all':
+            message = "Sinalizador inválido!"
+            return (code, message)
+
+        rules = self.get_rules_from_database()
+        if rules is None:
+            message = "Não foi possível obter regras do banco de dados!"
+            return (code, message)
+
+        code = CommandResponseType.OK
+        return (code, rules)
+
+    def remove_rule(self, args: List[str]):
+        code = CommandResponseType.ERROR
+
+        if len(args) != 1:
+            message = "Número de argumentos inválido!"
+            return (code, message)
+
+        address_or_id = args.pop()
+
+        content = self.get_database_content()
+        database = loads(content)
+        rule_list = database.get("rules")
+
+        for rule_id in rule_list:
+            rule = rule_list[rule_id]
+            if address_or_id in [rule_id, rule.get("ip")]:
+                rule_list.pop(rule_id)
+
+                database['rules'] = rule_list
+
+                self.save_dict_to_database(database)
+
+                code = CommandResponseType.OK
+                message = "Regra removida com sucesso!"
+                return (code, message)
+
+        message = "Regra não encontrada!"
+        return (code, message)
 
 
 def get_client_commands():
@@ -218,5 +337,6 @@ def get_client_commands():
 
 def get_server_commands():
     return [
-        UserCommand()
+        UserCommand(),
+        RuleCommand()
     ]
