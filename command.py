@@ -1,4 +1,6 @@
-from typing import List
+from typing import Dict, List
+from json import dumps, loads
+from os import system
 
 from command_response_type import CommandResponseType
 from models import User
@@ -77,18 +79,88 @@ class ExitCommand(Command):
 
 class UserCommand(Command):
     name = "user"
+    database_name = 'database.json'
+
+    def get_database_content(self):
+        with open(file=self.database_name, mode='r') as file:
+            content = '\n'.join(file.readlines())
+            return content
+
+    def save_dict_to_database(self, database_dict):
+        with open(file=self.database_name, mode='w') as file:
+            content_json = dumps(database_dict, indent=2)
+            file.write(content_json)
+
+    def add_user_to_database(self, user: User):
+        db = {}
+
+        content = self.get_database_content()
+        db.update(loads(content))
+        db['users'].update({user.id: user.get()})
+
+        self.save_dict_to_database(db)
+
+        return (CommandResponseType.OK, f'Usuário criado com sucesso!')
+
+    def parse_users_list_as_string(self, users: Dict[str, str]):
+        return '\n'.join(map(lambda x: f'ID: {x}\nNome: {users[x]["name"]}\nEmail: {users[x]["email"]}\n', users))
+
+    def get_users_from_database(self):
+        content = self.get_database_content()
+        users = loads(content).get('users')
+
+        if not users:
+            return None
+
+        return 'Lista de usuários cadastrados:\n' + self.parse_users_list_as_string(users)
 
     def create_user(self, args: List[str]):
-        print("Criar usuário", args)
-        return CommandResponseType.OK
+        if len(args) < 3:
+            return (CommandResponseType.ERROR, "Número de argumentos inválido!")
+
+        password = args.pop()
+        email = args.pop()
+        name = ' '.join(args)
+        user = User(name, email, password)
+
+        return self.add_user_to_database(user)
 
     def list_users(self, args: List[str]):
-        print("Mostrar lista de usuários", args)
-        return CommandResponseType.OK
+        if len(args) != 1:
+            return (CommandResponseType.ERROR, "Número de argumentos inválido!")
+
+        flag = args.pop()
+        if flag != 'all':
+            return (CommandResponseType.ERROR, "Sinalizador inválido!")
+
+        users = self.get_users_from_database()
+        if users is None:
+            return (CommandResponseType.ERROR, "Não foi possível obter usuários do banco de dados!")
+
+        return (CommandResponseType.OK, users)
 
     def remove_user(self, args: List[str]):
-        print("Deletar usuário", args)
-        return CommandResponseType.OK
+        if len(args) != 1:
+            return (CommandResponseType.ERROR, "Número de argumentos inválido!")
+
+        email_or_id = args.pop()
+
+        content = self.get_database_content()
+        database = loads(content)
+        user_list = database.get("users")
+
+        for user_id in user_list:
+            user = user_list[user_id]
+            if email_or_id in [user_id, user.get("email")]:
+                user_list.pop(user_id)
+
+                database['users'] = user_list
+
+                self.save_dict_to_database(database)
+
+                return (CommandResponseType.OK, "Usuário removido com sucesso!")
+
+        return (CommandResponseType.ERROR, "Usuário não encontrado!")
 
     def run(self):
         available_actions = {
@@ -98,13 +170,13 @@ class UserCommand(Command):
         }
 
         args = self.get_args()
-        if not args:
-            return CommandResponseType.ERROR
+        if not (args and len(args) >= 1):
+            return (CommandResponseType.ERROR, "Não há argumentos suficientes!")
 
-        command_action = args[0]
+        command_action = args.pop(0)
 
         if command_action not in available_actions:
-            return CommandResponseType.ERROR
+            return (CommandResponseType.ERROR, "Operação não identificada!")
 
         selected_action = available_actions[command_action]
         return selected_action(args)
