@@ -83,16 +83,31 @@ class DatabaseCommand(Command):
     available_actions: Dict[str, FunctionType]
 
     def get_database_content(self):
+        '''
+        Abre o arquivo de banco de dados e retorna uma string contendo o 
+        que foi salvo.
+        '''
+
         with open(file=self.database_name, mode='r') as file:
             content = '\n'.join(file.readlines())
             return content
 
     def save_dict_to_database(self, database_dict):
+        '''
+        Salva um objeto representando o novo estado do banco de dados no 
+        arquivo .json.
+        '''
+
         with open(file=self.database_name, mode='w') as file:
             content_json = dumps(database_dict, indent=2)
             file.write(content_json)
 
     def run(self):
+        '''
+        Método principal para realizar operações relacionadas ao banco de 
+        dados. (Usuário/Regras)
+        '''
+
         code = CommandResponseType.ERROR
 
         args = self.get_args()
@@ -121,6 +136,11 @@ class UserCommand(DatabaseCommand):
         }
 
     def add_user_to_database(self, user: User):
+        '''
+        Abre o arquivo .json de banco de dados e atualiza a seção de 'users' 
+        com o novo usuário.
+        '''
+
         db = {}
 
         content = self.get_database_content()
@@ -135,6 +155,11 @@ class UserCommand(DatabaseCommand):
         return (code, message)
 
     def parse_user_list_as_string(self, users: Dict[str, str]):
+        '''
+        Retorna uma lista de usuários do banco de dados formatada para 
+        leitura pelo usuário.
+        '''
+
         return 'Lista de usuários cadastrados:\n' + \
             '\n'.join(map(
                 lambda x:
@@ -145,6 +170,10 @@ class UserCommand(DatabaseCommand):
             ))
 
     def get_users_from_database(self):
+        '''
+        Retorna usuários no banco de dados na seção 'users'.
+        '''
+
         content = self.get_database_content()
         users = loads(content).get('users')
 
@@ -154,6 +183,10 @@ class UserCommand(DatabaseCommand):
         return self.parse_user_list_as_string(users)
 
     def create_user(self, args: List[str]):
+        '''
+        Método principal chamado para adicionar um usuário no banco de dados.
+        '''
+
         code = CommandResponseType.ERROR
 
         if len(args) < 3:
@@ -168,6 +201,10 @@ class UserCommand(DatabaseCommand):
         return self.add_user_to_database(user)
 
     def list_users(self, args: List[str]):
+        '''
+        Método principal chamado para listar usuários no banco de dados.
+        '''
+
         code = CommandResponseType.ERROR
 
         if len(args) != 1:
@@ -188,6 +225,10 @@ class UserCommand(DatabaseCommand):
         return (code, users)
 
     def remove_user(self, args: List[str]):
+        '''
+        Método principal chamado para remover um usuário do banco de dados.
+        '''
+
         code = CommandResponseType.ERROR
 
         if len(args) != 1:
@@ -228,6 +269,11 @@ class RuleCommand(DatabaseCommand):
         }
 
     def add_rule_to_database(self, rule: Rule):
+        '''
+        Abre o arquivo .json de banco de dados e atualiza a seção de 'rules' 
+        com a nova regra.
+        '''
+
         db = {}
 
         content = self.get_database_content()
@@ -242,6 +288,11 @@ class RuleCommand(DatabaseCommand):
         return (code, message)
 
     def parse_rule_list_as_string(self, rules: Dict[str, str]):
+        '''
+        Retorna uma lista de regras do banco de dados formatada para 
+        leitura pelo usuário.
+        '''
+
         return 'Lista de regras cadastradas:\n' + \
             '\n'.join(map(
                 lambda x:
@@ -252,6 +303,10 @@ class RuleCommand(DatabaseCommand):
             ))
 
     def get_rules_from_database(self):
+        '''
+        Retorna as regras do banco de dados na seção 'rules'.
+        '''
+
         content = self.get_database_content()
         rules = loads(content).get('rules')
 
@@ -261,6 +316,10 @@ class RuleCommand(DatabaseCommand):
         return self.parse_rule_list_as_string(rules)
 
     def add_rule(self, args: List[str]):
+        '''
+        Método principal chamado para adicionar uma regra no banco de dados.
+        '''
+
         code = CommandResponseType.ERROR
 
         if len(args) != 2:
@@ -279,6 +338,10 @@ class RuleCommand(DatabaseCommand):
         return self.add_rule_to_database(rule)
 
     def list_rules(self, args: List[str]):
+        '''
+        Método principal chamado para listar regras no banco de dados.
+        '''
+
         code = CommandResponseType.ERROR
         if len(args) != 1:
             message = "Número de argumentos inválido!"
@@ -298,6 +361,10 @@ class RuleCommand(DatabaseCommand):
         return (code, rules)
 
     def remove_rule(self, args: List[str]):
+        '''
+        Método principal chamado para remover uma regra do banco de dados.
+        '''
+
         code = CommandResponseType.ERROR
 
         if len(args) != 1:
@@ -332,11 +399,16 @@ class FirewallCommand(Command):
 
     def start(self):
         # Habilitar regra para permitir compartilhamento de pacotes
-        # Executar todas as regras salvas no banco de dados de acordo com os comandos de iptables
+
+        # Executar todas as regras salvas no banco de dados de acordo com
+        # os comandos de iptables
+
         return CommandResponseType.OK, 'show start'
 
     def stop(self):
-        # Limpar regras de iptables e desabilitar regras de compartilhamento de pacotes
+        # Limpar regras de iptables e desabilitar regras de
+        # compartilhamento de pacotes
+
         return CommandResponseType.OK, 'show stop'
 
     def run(self):
@@ -353,7 +425,7 @@ class FirewallCommand(Command):
         }
 
         action = args.pop(0)
-        if action not in available_actions or len(args):
+        if action not in available_actions or args:
             message = "Ação inválida!"
             return (code, message)
 
