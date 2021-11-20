@@ -63,6 +63,14 @@ class HelpCommand(Command):
         return CommandResponseType.OK
 
 
+class ClearCommand(Command):
+    name = "clear"
+
+    def run(self):
+        system('clear')
+        return CommandResponseType.OK
+
+
 class ExitCommand(Command):
     name = "exit"
 
@@ -107,6 +115,7 @@ class UserCommand(Command):
 
 def get_client_commands():
     return [
+        ClearCommand(),
         HelpCommand(),
         ExitCommand()
     ]
