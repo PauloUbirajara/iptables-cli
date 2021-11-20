@@ -84,7 +84,7 @@ class DatabaseCommand(Command):
 
     def get_database_content(self):
         '''
-        Abre o arquivo de banco de dados e retorna uma string contendo o 
+        Abre o arquivo de banco de dados e retorna uma string contendo o
         que foi salvo.
         '''
 
@@ -94,7 +94,7 @@ class DatabaseCommand(Command):
 
     def save_dict_to_database(self, database_dict):
         '''
-        Salva um objeto representando o novo estado do banco de dados no 
+        Salva um objeto representando o novo estado do banco de dados no
         arquivo .json.
         '''
 
@@ -104,7 +104,7 @@ class DatabaseCommand(Command):
 
     def run(self):
         '''
-        Método principal para realizar operações relacionadas ao banco de 
+        Método principal para realizar operações relacionadas ao banco de
         dados. (Usuário/Regras)
         '''
 
@@ -137,7 +137,7 @@ class UserCommand(DatabaseCommand):
 
     def add_user_to_database(self, user: User):
         '''
-        Abre o arquivo .json de banco de dados e atualiza a seção de 'users' 
+        Abre o arquivo .json de banco de dados e atualiza a seção de 'users'
         com o novo usuário.
         '''
 
@@ -156,7 +156,7 @@ class UserCommand(DatabaseCommand):
 
     def parse_user_list_as_string(self, users: Dict[str, str]):
         '''
-        Retorna uma lista de usuários do banco de dados formatada para 
+        Retorna uma lista de usuários do banco de dados formatada para
         leitura pelo usuário.
         '''
 
@@ -270,7 +270,7 @@ class RuleCommand(DatabaseCommand):
 
     def add_rule_to_database(self, rule: Rule):
         '''
-        Abre o arquivo .json de banco de dados e atualiza a seção de 'rules' 
+        Abre o arquivo .json de banco de dados e atualiza a seção de 'rules'
         com a nova regra.
         '''
 
@@ -289,7 +289,7 @@ class RuleCommand(DatabaseCommand):
 
     def parse_rule_list_as_string(self, rules: Dict[str, str]):
         '''
-        Retorna uma lista de regras do banco de dados formatada para 
+        Retorna uma lista de regras do banco de dados formatada para
         leitura pelo usuário.
         '''
 
@@ -398,16 +398,18 @@ class FirewallCommand(Command):
     name = "firewall"
 
     def start(self):
-        # Habilitar regra para permitir compartilhamento de pacotes
-
-        # Executar todas as regras salvas no banco de dados de acordo com
-        # os comandos de iptables
+        '''
+        Método principal para permitir compartilhamento de pacotes e
+        executar regras salvas no banco de dados no iptables.
+        '''
 
         return CommandResponseType.OK, 'show start'
 
     def stop(self):
-        # Limpar regras de iptables e desabilitar regras de
-        # compartilhamento de pacotes
+        '''
+        Método principal para parar compartilhamento de pacotes e limpar
+        regras executadas no iptables.
+        '''
 
         return CommandResponseType.OK, 'show stop'
 
