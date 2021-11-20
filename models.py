@@ -3,6 +3,7 @@ from uuid import uuid1
 
 
 class User:
+    id: str
     name: str
     email: str
     password: bytes
