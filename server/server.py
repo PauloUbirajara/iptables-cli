@@ -18,7 +18,7 @@ class Server(Thread):
 
     def create_database_if_not_exists(self):
         if not isfile(self.database_name):
-            default_database = {'users': {}, 'rules': []}
+            default_database = {'users': {}, 'rules': {}}
 
             with open(file=self.database_name, mode='w') as file:
                 file.write(dumps(default_database))
