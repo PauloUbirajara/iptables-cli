@@ -4,9 +4,8 @@ from typing import Union
 from json import dumps
 from sys import path
 path.append('..')
-from command import CommandResponseType, get_server_commands
-
-# from models import User
+from command_response_type import CommandResponseType
+from command import get_server_commands
 
 
 class ServerHandler(Thread):
@@ -34,18 +33,10 @@ class ServerHandler(Thread):
             if cmd.check(command):
                 return cmd.run()
 
-        return CommandResponseType.ERROR
-
-    def parse_response_code_as_json(self, code: CommandResponseType):
-        print(f'[+] Novo client: {self.client_address}')
-            "code": code.__str__()
-        }
-        print(f"{response_object=}")
-
-        return dumps(response_object).encode('utf8')
+        return (CommandResponseType.ERROR, "Comando inválido!")
 
     def run(self):
-        print(f'Iniciando conexão com {self.client_address}')
+        print(f'[+] Novo client: {self.client_address}')
 
         with self.conn:
             while True:
