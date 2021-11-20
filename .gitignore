@@ -2,4 +2,4 @@
 **/__pycache__
 
 # Remover arquivo local que representa o banco de dados
-server/database.json
+**/database.json
