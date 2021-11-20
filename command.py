@@ -330,12 +330,13 @@ class RuleCommand(DatabaseCommand):
 class FirewallCommand(Command):
     name = "firewall"
 
-    def start(self, args):
-        print(args)
+    def start(self):
+        # Habilitar regra para permitir compartilhamento de pacotes
+        # Executar todas as regras salvas no banco de dados de acordo com os comandos de iptables
         return CommandResponseType.OK, 'show start'
 
-    def stop(self, args):
-        print(args)
+    def stop(self):
+        # Limpar regras de iptables e desabilitar regras de compartilhamento de pacotes
         return CommandResponseType.OK, 'show stop'
 
     def run(self):
@@ -352,11 +353,11 @@ class FirewallCommand(Command):
         }
 
         action = args.pop(0)
-        if action not in available_actions:
+        if action not in available_actions or len(args):
             message = "Ação inválida!"
             return (code, message)
 
-        return available_actions[action](args)
+        return available_actions[action]()
 
 
 def get_client_commands():
@@ -370,5 +371,6 @@ def get_client_commands():
 def get_server_commands():
     return [
         UserCommand(),
-        RuleCommand()
+        RuleCommand(),
+        FirewallCommand()
     ]
