@@ -26,3 +26,20 @@ class User:
             'email': self.email,
             'password': self.password.decode('utf8')
         }
+
+
+class Rule:
+    id: str
+    ip: str
+    action: str
+
+    def __init__(self, ip: str, action: str):
+        self.id = str(uuid1())
+        self.ip = ip
+        self.action = action
+
+    def get(self):
+        return {
+            'ip': self.ip,
+            'action': self.action,
+        }
