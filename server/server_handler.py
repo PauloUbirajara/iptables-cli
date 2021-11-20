@@ -18,6 +18,15 @@ class ServerHandler(Thread):
         self.conn = conn
         self.client_address = f'{addr[0]}:{addr[1]}'
 
+    def parse_response_code_as_json(self, code: CommandResponseType, message: str):
+        response_object = {
+            "message": message,
+            "code": code.__str__()
+        }
+        print(f"{response_object=}")
+
+        return dumps(response_object).encode('utf8')
+
     def check_for_available_commands(self, command: str):
         available_commands = get_server_commands()
 
@@ -28,7 +37,7 @@ class ServerHandler(Thread):
         return CommandResponseType.ERROR
 
     def parse_response_code_as_json(self, code: CommandResponseType):
-        response_object = {
+        print(f'[+] Novo client: {self.client_address}')
             "code": code.__str__()
         }
         print(f"{response_object=}")
@@ -48,8 +57,8 @@ class ServerHandler(Thread):
 
                 command = data.decode('utf8')
                 print("server - recebi", command)
-                code = self.check_for_available_commands(command)
-                response = self.parse_response_code_as_json(code)
+                code, message = self.check_for_available_commands(command)
+                response = self.parse_response_code_as_json(code, message)
                 self.conn.sendall(response)
 
-        print(f'Finalizando conexão com {self.client_address}')
+        print(f'[-] Client desconectou: {self.client_address}')
