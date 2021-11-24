@@ -16,9 +16,17 @@ class Server(Thread):
         self.addr = (host, port)
         self.create_database_if_not_exists()
 
+    def get_default_database_dict(self):
+        db_dict = {
+            'users': {},
+            'rules': {}
+        }
+
+        return db_dict
+
     def create_database_if_not_exists(self):
         if not isfile(self.database_name):
-            default_database = {'users': {}, 'rules': {}}
+            default_database = self.get_default_database_dict()
 
             with open(file=self.database_name, mode='w') as file:
                 file.write(dumps(default_database))
