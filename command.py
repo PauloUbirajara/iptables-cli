@@ -6,6 +6,8 @@ from os import system
 from command_response_type import CommandResponseType
 from models import User, Rule
 
+IFACE_LAN = 'enp0s8'
+IFACE_WAN = 'enp0s3'
 
 class Command:
     name: str
@@ -403,6 +405,12 @@ class FirewallCommand(Command):
         executar regras salvas no banco de dados no iptables.
         '''
 
+        #! Remover nomes em scripts para poder usar str.format
+        #! Chamar scripts:
+        #! - enable_internet_via_nat.script ()
+        #! - change_ip_forwarding.script (1)
+        #! - address_action_to_server.script (iface_lan, iface_wan, ip_addr, action)
+
         return CommandResponseType.OK, 'show start'
 
     def stop(self):
@@ -410,6 +418,12 @@ class FirewallCommand(Command):
         Método principal para parar compartilhamento de pacotes e limpar
         regras executadas no iptables.
         '''
+
+        #! Remover nomes em scripts para poder usar str.format
+        #! Chamar scripts
+        #! - clear_iptables_rules.script ()
+        #! - change_ip_forwarding.script (0)
+
 
         return CommandResponseType.OK, 'show stop'
 
