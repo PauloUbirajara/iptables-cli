@@ -399,19 +399,70 @@ class RuleCommand(DatabaseCommand):
 class FirewallCommand(Command):
     name = "firewall"
 
+    def clear_iptables_rules(self):
+        clear_iptables_file = "../scripts/clear_iptables_rules.script" 
+        with open(clear_iptables_file, mode="r") as file:
+            commands = file.readlines()
+            for iptables_command in commands:
+                system(iptables_command)
+
+    def enable_internet_via_nat(self):
+        enable_internet_via_nat_file  = "../scripts/enable_internet_via_nat.script" 
+        with open(enable_internet_via_nat_file, mode="r") as file:
+            command = file.readlines()[0]
+            system(command) 
+
+    def enable_ip_forwarding(self, enable: bool):
+        change_ip_forwarding_file  = "../scripts/change_ip_forwarding.script" 
+        with open(change_ip_forwarding_file, mode="r") as file:
+            command = file.readlines()[0].format(int(enable))
+            system(command) 
+
+    def set_address_permission_in_iptables(self, address: str, action: str):
+        address_action_to_server_file = "../scripts/address_action_to_server.script"
+        with open(address_action_to_server_file, mode="r") as file:
+            commands = file.readlines()
+            for address_action in commands:
+                system(address_action.format(IFACE_LAN, IFACE_WAN, address, action))
+
+    def apply_rules_to_iptables(self, rule_list):
+        for rule_id in rule_list:
+            rule = rule_list[rule_id]
+            ip, action = rule.get("ip"), rule.get("action")
+            if action == "DENY":
+                action = "DROP"
+            self.set_address_permission_in_iptables(ip, action)
+            # Retornar codigo e mensagem
+
     def start(self):
         '''
         Método principal para permitir compartilhamento de pacotes e
         executar regras salvas no banco de dados no iptables.
         '''
 
+        code = CommandResponseType.ERROR
         #! Remover nomes em scripts para poder usar str.format
         #! Chamar scripts:
-        #! - enable_internet_via_nat.script ()
         #! - change_ip_forwarding.script (1)
         #! - address_action_to_server.script (iface_lan, iface_wan, ip_addr, action)
 
-        return CommandResponseType.OK, 'show start'
+        self.enable_internet_via_nat() 
+        self.enable_ip_forwarding(True)
+
+        content = RuleCommand().get_database_content()
+        rule_list = loads(content).get('rules')
+
+        if rule_list is None:
+            message = "Não foi possível obter regras cadastradas no banco de dados!"
+            return (code, message)
+        
+        self.apply_rules_to_iptables(rule_list)
+        # ADICIONAR VERIFICACAO NA CLASSE RULECOMMAND PARA PROCURAR SE REGRAS JA EXISTEM COM AQUELE IP, CASO SIM, SUBSTITUIR OU RECLAMAR QUE JA EXISTE!!
+
+        code = CommandResponseType.OK
+        message = 'Regras de firewall aplicadas com sucesso!'
+
+        return (code, message)
 
     def stop(self):
         '''
@@ -419,13 +470,15 @@ class FirewallCommand(Command):
         regras executadas no iptables.
         '''
 
-        #! Remover nomes em scripts para poder usar str.format
-        #! Chamar scripts
-        #! - clear_iptables_rules.script ()
-        #! - change_ip_forwarding.script (0)
+        self.enable_ip_forwarding(False)
+        self.clear_iptables_rules()
 
+        # Retornar como erro caso algum system tenha o error code diferente de 0
+        # Significa que o usuário não iniciou o server como admin
+        code = CommandResponseType.OK
+        message = 'Regras de firewall redefinidas com sucesso!'
 
-        return CommandResponseType.OK, 'show stop'
+        return (code, message)
 
     def run(self):
         code = CommandResponseType.ERROR
