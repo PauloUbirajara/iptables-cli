@@ -1,2 +1,2 @@
-iptables -t filter -A FORWARD -i {iface_lan} -o {iface_wan} -s {ip_addr} -j {action}
-iptables -t filter -A FORWARD -o {iface_lan} -i {iface_wan} -s {ip_addr} -j {action}
+iptables -t filter -A FORWARD -i {} -o {} -s {} -j {}
+iptables -t filter -A FORWARD -o {} -i {} -s {} -j {}
