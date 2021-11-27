@@ -22,7 +22,6 @@ class ServerHandler(Thread):
             "code": code.__str__(),
             "message": message
         }
-        print(f"{response_object=}")
 
         return dumps(response_object).encode('utf8')
 
@@ -49,9 +48,9 @@ class ServerHandler(Thread):
                     break
 
                 command = data.decode('utf8')
-                print("server - recebi", command)
                 code, message = self.check_for_available_commands(command)
                 response = self.parse_response_code_as_json(code, message)
+
                 self.conn.sendall(response)
 
         print(f'[-] Client desconectou: {self.client_address}')
