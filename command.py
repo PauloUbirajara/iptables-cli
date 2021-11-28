@@ -583,13 +583,16 @@ class RuleCommand(DatabaseCommand):
 class FirewallCommand(DatabaseCommand):
     name = "firewall"
 
-    def run_script_file(self, file: str, args=[]):
+    def run_script_file(self, filename: str, args=None):
         '''
         Abre um arquivo na pasta "./scripts" e executa de acordo com os
         argumentos passados.
         '''
 
-        with open(file, mode='r') as file:
+        if args is None:
+            args = []
+
+        with open(filename, mode='r') as file:
             commands = file.readlines()
 
             for line in commands:
