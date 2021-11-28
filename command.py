@@ -477,7 +477,6 @@ class RuleCommand(DatabaseCommand):
         Retorna as regras do banco de dados na seção 'rules'.
         '''
 
-        global USER_LOGGED_IN
         user_id = USER_LOGGED_IN.id
 
         rules = self.get_rules_by_user_id(user_id)
@@ -489,7 +488,6 @@ class RuleCommand(DatabaseCommand):
         Método principal chamado para adicionar uma regra no banco de dados.
         '''
 
-        global USER_LOGGED_IN
         code = CommandResponseType.ERROR
 
         if len(args) != 2:
@@ -517,7 +515,6 @@ class RuleCommand(DatabaseCommand):
         Método principal chamado para listar regras no banco de dados.
         '''
 
-        global USER_LOGGED_IN
         code = CommandResponseType.ERROR
 
         if len(args) != 1:
@@ -546,7 +543,6 @@ class RuleCommand(DatabaseCommand):
         Método principal chamado para remover uma regra do banco de dados.
         '''
 
-        global USER_LOGGED_IN
         code = CommandResponseType.ERROR
 
         if len(args) != 1:
@@ -658,7 +654,6 @@ class FirewallCommand(DatabaseCommand):
         permitindo ou restringindo o acesso à internet.
         '''
 
-        global USER_LOGGED_IN
         user_id = USER_LOGGED_IN.id
 
         for rule_id in rule_list:
@@ -728,7 +723,6 @@ class FirewallCommand(DatabaseCommand):
         return (code, message)
 
     def run(self):
-        global USER_LOGGED_IN
         code = CommandResponseType.ERROR
 
         args = self.get_args()
