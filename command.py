@@ -615,12 +615,6 @@ class FirewallCommand(DatabaseCommand):
         Limpa as regras definidas no iptables.
         '''
 
-        # clear_iptables_file = "../scripts/clear_iptables_rules.script"
-
-        # with open(clear_iptables_file, mode="r") as file:
-        #     commands = file.readlines()
-        #     for iptables_command in commands:
-        #         system(iptables_command)
         file = '../scripts/clear_iptables_rules.script'
         result = self.run_script_file(file)
 
@@ -635,10 +629,6 @@ class FirewallCommand(DatabaseCommand):
         result = self.run_script_file(file)
         return result
 
-        # with open(file, mode="r") as file:
-        #     command = file.readlines()[0]
-        #     system(command)
-
     def enable_ip_forwarding(self, enable: bool):
         '''
         Permite o encaminhamento de pacotes.
@@ -649,10 +639,6 @@ class FirewallCommand(DatabaseCommand):
         result = self.run_script_file(file, args)
 
         return result
-
-        # with open(file, mode="r") as file:
-        #     command = file.readlines()[0].format(int(enable))
-        #     system(command)
 
     def set_address_permission_in_iptables(self, address: str, action: str):
         '''
@@ -665,18 +651,6 @@ class FirewallCommand(DatabaseCommand):
         result = self.run_script_file(file, args)
 
         return result
-
-        # with open(address_action_to_server_file, mode="r") as file:
-        #     commands = file.readlines()
-        #     for address_action in commands:
-        #         system(
-        #             address_action.format(
-        #                 IFACE_LAN,
-        #                 IFACE_WAN,
-        #                 address,
-        #                 action
-        #             )
-        #         )
 
     def apply_rules_to_iptables(self, rule_list):
         '''
