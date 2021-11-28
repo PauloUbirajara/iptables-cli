@@ -299,7 +299,6 @@ class UserCommand(DatabaseCommand):
         Método principal chamado para remover um usuário do banco de dados.
         '''
 
-        global USER_LOGGED_IN
         code = CommandResponseType.ERROR
 
         if len(args) != 1:
@@ -341,7 +340,6 @@ class UserCommand(DatabaseCommand):
         Realiza o login de usuário após esse fornecer o email e senha corretos.
         '''
 
-        global USER_LOGGED_IN
         code = CommandResponseType.ERROR
 
         if len(args) != 2:
@@ -359,6 +357,7 @@ class UserCommand(DatabaseCommand):
             message = 'E-mail ou senha inválidos!'
             return (code, message)
 
+        global USER_LOGGED_IN
         USER_LOGGED_IN = result
 
         code = CommandResponseType.OK
@@ -372,7 +371,6 @@ class UserCommand(DatabaseCommand):
         '''
 
         code = CommandResponseType.ERROR
-        global USER_LOGGED_IN
 
         if args:
             message = 'Quantia de argumentos inválidos!'
@@ -382,6 +380,7 @@ class UserCommand(DatabaseCommand):
             message = 'Usuário não está logado!'
             return (code, message)
 
+        global USER_LOGGED_IN
         USER_LOGGED_IN = None
 
         code = CommandResponseType.OK
