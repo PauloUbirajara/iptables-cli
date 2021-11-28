@@ -340,6 +340,7 @@ class UserCommand(DatabaseCommand):
         Realiza o login de usuário após esse fornecer o email e senha corretos.
         '''
 
+        global USER_LOGGED_IN
         code = CommandResponseType.ERROR
 
         if len(args) != 2:
@@ -357,7 +358,6 @@ class UserCommand(DatabaseCommand):
             message = 'E-mail ou senha inválidos!'
             return (code, message)
 
-        global USER_LOGGED_IN
         USER_LOGGED_IN = result
 
         code = CommandResponseType.OK
@@ -370,6 +370,7 @@ class UserCommand(DatabaseCommand):
         Desloga um usuário de sua conta.
         '''
 
+        global USER_LOGGED_IN
         code = CommandResponseType.ERROR
 
         if args:
@@ -380,7 +381,6 @@ class UserCommand(DatabaseCommand):
             message = 'Usuário não está logado!'
             return (code, message)
 
-        global USER_LOGGED_IN
         USER_LOGGED_IN = None
 
         code = CommandResponseType.OK
