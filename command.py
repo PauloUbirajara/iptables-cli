@@ -402,9 +402,14 @@ class RuleCommand(DatabaseCommand):
 
     def check_if_unique_rule_in_database(self, rule: Rule):
         rules = self.get_table_from_database(DatabaseTableType.RULE)
+        user_id = USER_LOGGED_IN.id
 
         for id in rules:
             r = rules[id]
+
+            if r['user_id'] != user_id:
+                continue
+
             address = r['ip']
 
             if address == rule.ip:
