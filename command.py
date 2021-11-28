@@ -640,8 +640,8 @@ class FirewallCommand(DatabaseCommand):
 
     def set_address_permission_in_iptables(self, address: str, action: str):
         '''
-        Aplica uma regra individual a um endereço, permitindo ou não seu acesso 
-        à internet.        
+        Aplica uma regra individual a um endereço, permitindo ou não seu acesso
+        à internet.
         '''
 
         file = "../scripts/address_action_to_server.script"
@@ -652,7 +652,7 @@ class FirewallCommand(DatabaseCommand):
 
     def apply_rules_to_iptables(self, rule_list):
         '''
-        Aplica as regras definidas no banco de dados para cada endereço, 
+        Aplica as regras definidas no banco de dados para cada endereço,
         permitindo ou restringindo o acesso à internet.
         '''
 
