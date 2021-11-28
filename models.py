@@ -8,12 +8,12 @@ class User:
     email: str
     password: bytes
 
-    def __init__(self, name: str='', email: str='', password: str=''):
+    def __init__(self, name: str = '', email: str = '', password: str = ''):
         self.id = str(uuid1())
         self.name = name
         self.email = email
         self.password = self.encrypt_password(password)
-    
+
     @staticmethod
     def new_from_dict(id, user_dict):
         result = User()
