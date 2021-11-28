@@ -53,6 +53,7 @@ class ClientHandler(Thread):
 
             current_socket.connect(self.addr)
             print(f'Iniciando conexão com {self.server_address}')
+            print('Digite "help" para mostrar comandos disponíveis')
 
             while True:
                 command = input('> ')
@@ -60,7 +61,7 @@ class ClientHandler(Thread):
                 code = self.check_for_available_commands(command)
 
                 if code == CommandResponseType.ERROR:
-                    print("Houve algum erro ao executar o comando, tente novamente!")
+                    print("Erro ao executar o comando, tente novamente!")
                     continue
 
                 if code == CommandResponseType.STOP:

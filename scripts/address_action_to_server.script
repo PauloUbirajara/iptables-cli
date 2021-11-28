@@ -1,0 +1,2 @@
+iptables -t filter -A FORWARD -i {} -o {} -s {} -j {}
+iptables -t filter -A FORWARD -o {} -i {} -s {} -j {}
